@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Per Te</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- IMPOSTAZIONI GENERALI --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            text-align: center;
+            background-color: #faeee7;
+        }
+
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            z-index: -2;
+        }
+
+        /* --- VARIABILI COLORI E DIMENSIONI --- */
+        :root {
+            --card-width: 500px;
+            --card-bg: #fffbf0;
+            --card-border: #e6d7c3;
+            --primary-color: #ff4757;
+        }
+
+        /* --- FASE 1: LA BUSTA --- */
+        .stage-container {
+            position: relative;
+            perspective: 1000px; 
+            z-index: 10;
+        }
+
+        .envelope-wrapper {
+            width: var(--card-width);
+            height: 400px;
+            background-color: var(--card-bg);
+            position: relative;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid var(--card-border);
+            padding-top: 180px; 
+            box-sizing: border-box; 
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 250px solid transparent;
+            border-right: 250px solid transparent;
+            border-top: 160px solid #eaddcf;
+            transform-origin: top center;
+            transition: transform 0.8s ease-in-out, z-index 0.8s;
+            z-index: 5;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .letter-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .envelope-wrapper.open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 0; 
+            opacity: 0.6;
+        }
+        .envelope-wrapper.open .letter-content {
+            opacity: 0;
+        }
+
+        /* --- STILE CARTELLI (VIDEO, PROPOSTA, FINALE) --- */
+        .standard-container {
+            width: var(--card-width);
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border: 2px solid var(--card-border);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px; /* Stessa altezza base per tutti */
+        }
+
+        /* --- STILI ELEMENTI --- */
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: var(--primary-color);
+            font-size: 2.2rem;
+            margin: 0 0 20px 0;
+        }
+
+        p { color: #666; font-size: 1.1rem; margin-bottom: 25px; line-height: 1.5; }
+
+        input {
+            padding: 12px;
+            border-radius: 50px;
+            border: 2px solid #e6d7c3;
+            width: 70%;
+            font-size: 1.1rem;
+            outline: none;
+            text-align: center;
+            background: #fff;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.2s;
+            font-family: 'Pacifico', cursive;
+        }
+        .btn:hover { transform: scale(1.05); }
+
+        .error-msg { color: #e74c3c; font-size: 0.9rem; margin-top: 15px; display: none; font-weight: 600;}
+
+        /* --- STILE VIDEO --- */
+        video {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+
+        /* --- PROPOSTA --- */
+        .buttons-container {
+            display: flex; justify-content: center; gap: 30px; margin-top: 20px; width: 100%; position: relative;
+        }
+
+        #no-btn {
+            background-color: #b2bec3;
+            position: absolute;
+            z-index: 100;
+        }
+
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <div class="background-overlay"></div>
+
+    <div class="stage-container" id="stage-letter">
+        <div class="envelope-wrapper" id="main-envelope">
+            <div class="envelope-flap"></div>
+            <div class="letter-content">
+                <p>Per leggere la lettera, rispondi alla domanda:<br>
+                <strong>Come si chiama il tuo amore?</strong></p>
+                <input type="text" id="name-input" placeholder="Scrivi qui..." autocomplete="off">
+                <div class="error-msg" id="error-msg">Mmm... sbagliato! Riprova ❤️</div>
+                <button class="btn" onclick="checkNameAndOpen()">Apri</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="standard-container hidden" id="stage-video">
+        <h1 style="font-size: 1.8rem;">Guarda qui... ❤️</h1>
+        
+        <video id="intro-video" controls playsinline>
+            <source src="video.mp4" type="video/mp4">
+            Il tuo browser non supporta il video.
+        </video>
+        
+        <p style="font-size: 0.9rem; margin-bottom: 5px;">(Il video andrà avanti da solo alla fine...)</p>
+        <button class="btn" style="font-size: 1rem; padding: 8px 20px; background-color: #ff9f43;" onclick="finishVideo()">Salta Video >></button>
+    </div>
+
+    <div class="standard-container hidden" id="stage-proposal">
+        <h1 style="font-size: 3.5rem; margin-bottom: 40px;">Will you be my Valentine?</h1>
+        <div class="buttons-container">
+            <button class="btn" style="font-size: 1.8rem; padding: 15px 50px; background-color: #2ecc71;" onclick="acceptProposal()">Sì! ❤️</button>
+            <button class="btn" id="no-btn" onmouseover="moveButton()">No</button>
+        </div>
+    </div>
+
+    <div class="standard-container hidden" id="stage-success">
+        <h1 style="font-size: 3rem;">Yeee! Ti amo! ❤️</h1>
+        <p>Prepara le valigie... si festeggia!</p>
+        <div style="font-size: 7rem;">💏</div>
+    </div>
+
+    <script>
+        function checkNameAndOpen() {
+            const inputVal = document.getElementById('name-input').value;
+            const errorMsg = document.getElementById('error-msg');
+            const envelope = document.getElementById('main-envelope');
+            
+            if (inputVal.trim().toLowerCase() === 'francesco') {
+                errorMsg.style.display = 'none';
+                envelope.classList.add('open');
+                
+                // Dopo 1 secondo (apertura busta), passiamo al VIDEO
+                setTimeout(() => {
+                    document.getElementById('stage-letter').classList.add('hidden');
+                    document.getElementById('stage-video').classList.remove('hidden');
+                    
+                    // Facciamo partire il video
+                    const video = document.getElementById('intro-video');
+                    video.play().catch(e => console.log("Autoplay bloccato, serve click"));
+                    
+                    // Quando il video finisce, passa AUTOMATICAMENTE alla proposta
+                    video.onended = function() {
+                        finishVideo();
+                    };
+                    
+                }, 800);
+            } else {
+                errorMsg.style.display = 'block';
+                const input = document.getElementById('name-input');
+                input.style.borderColor = '#e74c3c';
+                input.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-10px)' }, { transform: 'translateX(10px)' }, { transform: 'translateX(0)' }], { duration: 300 });
+                setTimeout(() => input.style.borderColor = '#e6d7c3', 1000);
+            }
+        }
+
+        // Funzione per passare dal Video alla Proposta
+        function finishVideo() {
+            const video = document.getElementById('intro-video');
+            video.pause(); // Ferma il video se stiamo saltando
+            document.getElementById('stage-video').classList.add('hidden');
+            document.getElementById('stage-proposal').classList.remove('hidden');
+        }
+
+        function moveButton() {
+            const noBtn = document.getElementById('no-btn');
+            const maxWidth = window.innerWidth - 200; 
+            const maxHeight = window.innerHeight - 100;
+            const x = Math.max(50, Math.random() * maxWidth);
+            const y = Math.max(50, Math.random() * maxHeight);
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+        }
+
+        function acceptProposal() {
+            document.getElementById('stage-proposal').classList.add('hidden');
+            document.getElementById('stage-success').classList.remove('hidden');
+            launchConfetti();
+        }
+
+        function launchConfetti() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            var random = function(min, max) { return Math.random() * (max - min) + min; }
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        document.getElementById('name-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkNameAndOpen();
+        });
+    </script>
+</body>
+</html>
