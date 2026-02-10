@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -15,6 +15,7 @@
             font-family: 'Poppins', sans-serif;
             height: 100vh;
             display: flex;
+            flex-direction: column; /* Importante per posizionare il tasto skip sotto */
             justify-content: center;
             align-items: center;
             overflow: hidden;
@@ -32,7 +33,7 @@
             z-index: -2;
         }
 
-        /* --- VARIABILI COLORI E DIMENSIONI --- */
+        /* --- VARIABILI --- */
         :root {
             --card-width: 500px;
             --card-bg: #fffbf0;
@@ -92,11 +93,52 @@
             z-index: 0; 
             opacity: 0.6;
         }
-        .envelope-wrapper.open .letter-content {
-            opacity: 0;
+        .envelope-wrapper.open .letter-content { opacity: 0; }
+
+        /* --- FASE 2: VIDEOPLAYER (Stile Speciale) --- */
+        /* Questo container non ha padding per far stare il video a filo */
+        .video-container {
+            width: var(--card-width);
+            background-color: #000; /* Sfondo nero per il video */
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 2px solid var(--card-border);
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Taglia gli angoli del video */
+            aspect-ratio: 16/9; /* Mantiene proporzione video */
+            min-height: auto; /* Altezza automatica in base alla larghezza */
         }
 
-        /* --- STILE CARTELLI (VIDEO, PROPOSTA, FINALE) --- */
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Assicura che riempia tutto lo spazio */
+            display: block;
+        }
+
+        /* Tasto SKIP esterno */
+        #skip-external {
+            margin-top: 20px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #skip-external:hover {
+            background: rgba(255, 71, 87, 0.8);
+            border-color: transparent;
+        }
+
+        /* --- FASE 3 e 4: CARTELLI STANDARD --- */
         .standard-container {
             width: var(--card-width);
             background-color: var(--card-bg);
@@ -109,10 +151,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 400px; /* Stessa altezza base per tutti */
+            min-height: 400px; 
         }
 
-        /* --- STILI ELEMENTI --- */
         h1 {
             font-family: 'Pacifico', cursive;
             color: var(--primary-color);
@@ -132,6 +173,7 @@
             text-align: center;
             background: #fff;
         }
+        input:focus { border-color: var(--primary-color); }
 
         .btn {
             background-color: var(--primary-color);
@@ -149,15 +191,6 @@
 
         .error-msg { color: #e74c3c; font-size: 0.9rem; margin-top: 15px; display: none; font-weight: 600;}
 
-        /* --- STILE VIDEO --- */
-        video {
-            width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
-        }
-
-        /* --- PROPOSTA --- */
         .buttons-container {
             display: flex; justify-content: center; gap: 30px; margin-top: 20px; width: 100%; position: relative;
         }
@@ -189,16 +222,15 @@
         </div>
     </div>
 
-    <div class="standard-container hidden" id="stage-video">
-        <h1 style="font-size: 1.8rem;">Guarda qui... ❤️</h1>
-        
+    <div class="video-container hidden" id="stage-video">
         <video id="intro-video" controls playsinline>
-            <source src="Video.mp4" type="video/mp4">
+            <source src="video.mp4" type="video/mp4">
             Il tuo browser non supporta il video.
         </video>
-        
-        <p style="font-size: 0.9rem; margin-bottom: 5px;">(Il video andrà avanti da solo alla fine...)</p>
-        <button class="btn" style="font-size: 1rem; padding: 8px 20px; background-color: #ff9f43;" onclick="finishVideo()">Salta Video >></button>
+    </div>
+    
+    <div id="skip-wrapper" class="hidden">
+        <button id="skip-external" onclick="finishVideo()">Salta Video >></button>
     </div>
 
     <div class="standard-container hidden" id="stage-proposal">
@@ -225,16 +257,18 @@
                 errorMsg.style.display = 'none';
                 envelope.classList.add('open');
                 
-                // Dopo 1 secondo (apertura busta), passiamo al VIDEO
                 setTimeout(() => {
                     document.getElementById('stage-letter').classList.add('hidden');
+                    
+                    // Mostra il video container e il tasto skip esterno
                     document.getElementById('stage-video').classList.remove('hidden');
+                    document.getElementById('skip-wrapper').classList.remove('hidden');
                     
-                    // Facciamo partire il video
+                    // Avvia Video
                     const video = document.getElementById('intro-video');
-                    video.play().catch(e => console.log("Autoplay bloccato, serve click"));
+                    video.play().catch(e => console.log("Autoplay bloccato"));
                     
-                    // Quando il video finisce, passa AUTOMATICAMENTE alla proposta
+                    // Quando finisce, passa avanti
                     video.onended = function() {
                         finishVideo();
                     };
@@ -249,11 +283,16 @@
             }
         }
 
-        // Funzione per passare dal Video alla Proposta
+        // Funzione per passare alla proposta
         function finishVideo() {
             const video = document.getElementById('intro-video');
-            video.pause(); // Ferma il video se stiamo saltando
+            video.pause(); 
+            
+            // Nasconde video e tasto skip
             document.getElementById('stage-video').classList.add('hidden');
+            document.getElementById('skip-wrapper').classList.add('hidden');
+            
+            // Mostra proposta
             document.getElementById('stage-proposal').classList.remove('hidden');
         }
 
