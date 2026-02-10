@@ -1,21 +1,21 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Per Te</title>
+    <title>Per Te ❤️</title>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* --- IMPOSTAZIONI GENERALI --- */
+        /* --- RESET E LAYOUT --- */
         body {
             margin: 0;
             padding: 0;
             font-family: 'Poppins', sans-serif;
             height: 100vh;
             display: flex;
-            flex-direction: column; /* Importante per posizionare il tasto skip sotto */
+            flex-direction: column; /* Per allineare il tasto skip sotto */
             justify-content: center;
             align-items: center;
             overflow: hidden;
@@ -33,12 +33,29 @@
             z-index: -2;
         }
 
-        /* --- VARIABILI --- */
+        /* --- VARIABILI DI STILE (Tutto uguale) --- */
         :root {
             --card-width: 500px;
+            --card-height: 400px;
             --card-bg: #fffbf0;
             --card-border: #e6d7c3;
             --primary-color: #ff4757;
+        }
+
+        /* --- STILE COMUNE DEI PANNELLI --- */
+        .standard-container {
+            width: var(--card-width);
+            min-height: var(--card-height);
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border: 2px solid var(--card-border);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         /* --- FASE 1: LA BUSTA --- */
@@ -50,7 +67,7 @@
 
         .envelope-wrapper {
             width: var(--card-width);
-            height: 400px;
+            height: var(--card-height);
             background-color: var(--card-bg);
             position: relative;
             border-radius: 15px;
@@ -59,6 +76,7 @@
             flex-direction: column;
             align-items: center;
             border: 2px solid var(--card-border);
+            /* Spazio in alto per non coprire il testo con la linguetta */
             padding-top: 180px; 
             box-sizing: border-box; 
         }
@@ -69,6 +87,7 @@
             left: 0;
             width: 0;
             height: 0;
+            /* Triangolo perfetto per larghezza 500px */
             border-left: 250px solid transparent;
             border-right: 250px solid transparent;
             border-top: 160px solid #eaddcf;
@@ -95,65 +114,54 @@
         }
         .envelope-wrapper.open .letter-content { opacity: 0; }
 
-        /* --- FASE 2: VIDEOPLAYER (Stile Speciale) --- */
-        /* Questo container non ha padding per far stare il video a filo */
-        .video-container {
+        /* --- FASE 2: VIDEO --- */
+        /* Contenitore specifico per il video senza padding */
+        .video-wrapper {
             width: var(--card-width);
-            background-color: #000; /* Sfondo nero per il video */
+            height: auto; /* Adatta l'altezza */
+            min-height: 280px; /* Altezza minima */
+            background-color: #000;
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             border: 2px solid var(--card-border);
             box-sizing: border-box;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; /* Taglia gli angoli del video */
-            aspect-ratio: 16/9; /* Mantiene proporzione video */
-            min-height: auto; /* Altezza automatica in base alla larghezza */
         }
 
         video {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Assicura che riempia tutto lo spazio */
+            object-fit: cover;
             display: block;
         }
 
-        /* Tasto SKIP esterno */
-        #skip-external {
+        /* Tasto Skip esterno */
+        .skip-container {
             margin-top: 20px;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            padding: 8px 20px;
+        }
+        
+        #skip-btn {
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid #fff;
+            color: #ff4757;
+            padding: 8px 25px;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
             transition: 0.3s;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 0.9rem;
         }
-        #skip-external:hover {
-            background: rgba(255, 71, 87, 0.8);
-            border-color: transparent;
-        }
-
-        /* --- FASE 3 e 4: CARTELLI STANDARD --- */
-        .standard-container {
-            width: var(--card-width);
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            border: 2px solid var(--card-border);
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 400px; 
+        #skip-btn:hover {
+            background: #ff4757;
+            color: #fff;
         }
 
+        /* --- TESTI E INPUT --- */
         h1 {
             font-family: 'Pacifico', cursive;
             color: var(--primary-color);
@@ -191,6 +199,7 @@
 
         .error-msg { color: #e74c3c; font-size: 0.9rem; margin-top: 15px; display: none; font-weight: 600;}
 
+        /* --- PROPOSTA --- */
         .buttons-container {
             display: flex; justify-content: center; gap: 30px; margin-top: 20px; width: 100%; position: relative;
         }
@@ -215,22 +224,24 @@
             <div class="letter-content">
                 <p>Per leggere la lettera, rispondi alla domanda:<br>
                 <strong>Come si chiama il tuo amore?</strong></p>
+                
                 <input type="text" id="name-input" placeholder="Scrivi qui..." autocomplete="off">
                 <div class="error-msg" id="error-msg">Mmm... sbagliato! Riprova ❤️</div>
+                
                 <button class="btn" onclick="checkNameAndOpen()">Apri</button>
             </div>
         </div>
     </div>
 
-    <div class="video-container hidden" id="stage-video">
-        <video id="intro-video" controls playsinline>
-            <source src="video.mp4" type="video/mp4">
+    <div class="video-wrapper hidden" id="stage-video">
+        <video id="intro-video" controls playsinline muted preload="auto">
+            <source src="./video.mp4" type="video/mp4">
             Il tuo browser non supporta il video.
         </video>
     </div>
     
-    <div id="skip-wrapper" class="hidden">
-        <button id="skip-external" onclick="finishVideo()">Salta Video >></button>
+    <div class="skip-container hidden" id="skip-wrapper">
+        <button id="skip-btn" onclick="finishVideo()">Salta Video >></button>
     </div>
 
     <div class="standard-container hidden" id="stage-proposal">
@@ -257,17 +268,28 @@
                 errorMsg.style.display = 'none';
                 envelope.classList.add('open');
                 
+                // Aspetta 1 secondo (animazione busta) poi mostra video
                 setTimeout(() => {
                     document.getElementById('stage-letter').classList.add('hidden');
                     
-                    // Mostra il video container e il tasto skip esterno
+                    // Mostra video e tasto skip
                     document.getElementById('stage-video').classList.remove('hidden');
                     document.getElementById('skip-wrapper').classList.remove('hidden');
                     
-                    // Avvia Video
+                    // Avvia il video
                     const video = document.getElementById('intro-video');
-                    video.play().catch(e => console.log("Autoplay bloccato"));
-                    
+                    var playPromise = video.play();
+
+                    // Gestione errori di autoplay
+                    if (playPromise !== undefined) {
+                        playPromise.then(_ => {
+                            // Autoplay partito!
+                        })
+                        .catch(error => {
+                            console.log("Autoplay bloccato, l'utente deve premere play.");
+                        });
+                    }
+
                     // Quando finisce, passa avanti
                     video.onended = function() {
                         finishVideo();
@@ -275,33 +297,39 @@
                     
                 }, 800);
             } else {
+                // Errore password
                 errorMsg.style.display = 'block';
                 const input = document.getElementById('name-input');
                 input.style.borderColor = '#e74c3c';
-                input.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-10px)' }, { transform: 'translateX(10px)' }, { transform: 'translateX(0)' }], { duration: 300 });
+                input.animate([
+                    { transform: 'translateX(0)' }, 
+                    { transform: 'translateX(-10px)' }, 
+                    { transform: 'translateX(10px)' }, 
+                    { transform: 'translateX(0)' }
+                ], { duration: 300 });
                 setTimeout(() => input.style.borderColor = '#e6d7c3', 1000);
             }
         }
 
-        // Funzione per passare alla proposta
         function finishVideo() {
             const video = document.getElementById('intro-video');
             video.pause(); 
             
-            // Nasconde video e tasto skip
             document.getElementById('stage-video').classList.add('hidden');
             document.getElementById('skip-wrapper').classList.add('hidden');
             
-            // Mostra proposta
             document.getElementById('stage-proposal').classList.remove('hidden');
         }
 
         function moveButton() {
             const noBtn = document.getElementById('no-btn');
-            const maxWidth = window.innerWidth - 200; 
+            // Calcolo limiti sicuri per non uscire dallo schermo
+            const maxWidth = window.innerWidth - 150; 
             const maxHeight = window.innerHeight - 100;
-            const x = Math.max(50, Math.random() * maxWidth);
-            const y = Math.max(50, Math.random() * maxHeight);
+            
+            const x = Math.max(20, Math.random() * maxWidth);
+            const y = Math.max(20, Math.random() * maxHeight);
+            
             noBtn.style.position = 'fixed';
             noBtn.style.left = `${x}px`;
             noBtn.style.top = `${y}px`;
